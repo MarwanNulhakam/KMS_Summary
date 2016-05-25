@@ -9,7 +9,7 @@ package data;
  *
  * @author Wind Raider Zero
  */
-public class Constants {
+public class RefferenceTableForKMS {
     
     public static final double []maleBGM = {2.1,2.9,3.8,4.4,4.9,5.3,5.7,5.9,6.2,6.4,6.6,6.8,6.9,
                                 7.1,7.2,7.4,7.5,7.7,7.8,8,8.1,8.2,8.4,8.5,8.6,8.8,

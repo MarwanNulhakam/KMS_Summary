@@ -11,36 +11,14 @@ package mainPackage;
  */
 public class mainClass {
     public static void main(String[]args){
-        data.Person babyMarwan = new data.Person("marwan",    true,           8,      
-//                                                   name,is male?,  age(month),     
+        data.Person babyMarwan = new data.Person("marwan",    true, "2016/01/01",      
+//                                                   name,is male?,  dateOfBirth,     
                 
-                                                       5.7,         6.2, "2016/03/10", 5.5, "2016/02/12");
+                                                       5.7,         6.2, "2016/04/10", 5.5, "2016/03/12");
 //                                          current weight, prev weight, last visit  
 
-        data.Person babyZay = new data.Person("zay",    true,           6,      
-//                                             name, is male,   age(month),     
-                
-                                                       6.2,         5.7, "2016/03/10", 4.8, "2016/02/01");
-//                                          current weight, prev weight, last visit 
-
-        data.Person babyRana = new data.Person("rana",    false,           4,      
-//                                               name,  is male,  age(month),     
-                
-                                                       6.0,         0, "2016/01/10", 4.4, "2015/12/08");
-//                                          current weight, prev weight, last visit  
-
-        
         calculation.KMSCalculator machine = new calculation.KMSCalculator();
-        
-        machine.calculating(babyZay);
         machine.calculating(babyMarwan);
-        machine.calculating(babyRana);
-        
-        machine.printStatus(babyZay);
-        System.out.println("\n\n");
         machine.printStatus(babyMarwan);
-        System.out.println("\n\n");
-        machine.printStatus(babyRana);
-        
     }
 }

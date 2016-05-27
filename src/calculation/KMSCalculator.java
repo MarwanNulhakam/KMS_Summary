@@ -1,5 +1,7 @@
 package calculation;
 
+import java.text.SimpleDateFormat;
+
 /**
  *
  * @author Wind Raider Zero
@@ -15,34 +17,45 @@ public class KMSCalculator {
 //        bayi.Tidak2Kali = (tahun*360 + bulan*30 + hari) > 60;
 //    }
     
-    public int monthAges(String currentDate,String lastVisitDate){
+    public int monthAges(String lastVisitDate,String currentDate){
         int tahun = Integer.parseInt(currentDate.substring(0,4))-Integer.parseInt(lastVisitDate.substring(0,4));
         int bulan = Integer.parseInt(currentDate.substring(5,7))-Integer.parseInt(lastVisitDate.substring(5,7));
         int hari = Integer.parseInt(currentDate.substring(8))-Integer.parseInt(lastVisitDate.substring(8));
-        return(tahun*360 + bulan*30 + hari)/30;
+        return(tahun*12 + bulan + (int)(hari/30));
     }
     
     public void cek2T(data.Person bayi){
         boolean status = true;
-
-        if(bayi.isMale()) 
-            status = status && ((bayi.getPreviousWeight()!=0.0) ?
-                ((bayi.getWeight()-bayi.getPreviousWeight()+0.000000000000004)*1000) < data.RefferenceTableForKMS
-                .maleWeightUpIndicator[bayi.getAge() > 12 ? 12:bayi.getAge() ] : true);
-        else
-            status = status && ((bayi.getPreviousWeight()!=0.0) ?
-                ((bayi.getWeight()-bayi.getPreviousWeight()+0.000000000000004)*1000) < data.RefferenceTableForKMS
-                .femaleWeightUpIndicator[bayi.getAge() > 12 ? 12:bayi.getAge() ] : true);
-
-        if(bayi.isMale()) 
-            status = status && ((bayi.getSecondLastWeight()!=0.0) ?
-                ((bayi.getPreviousWeight()-bayi.getSecondLastWeight()+0.000000000000004)*1000) < data.RefferenceTableForKMS
-                .maleWeightUpIndicator[bayi.getAge()-monthAges(bayi.getLastVisitDate(),bayi.getSecondLastVisitDate()) > 12 ? 12:bayi.getAge() ] : true);
-        else
-            status = status && ((bayi.getSecondLastWeight()!=0.0) ?
-                ((bayi.getPreviousWeight()-bayi.getSecondLastWeight()+0.000000000000004)*1000) < data.RefferenceTableForKMS
-                .femaleWeightUpIndicator[bayi.getAge()-monthAges(bayi.getLastVisitDate(),bayi.getSecondLastVisitDate()) > 12 ? 12:bayi.getAge() ] : true);
-
+//        
+//        if(monthAges(new SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()),bayi.getLastVisitDate())>2){
+//            bayi.Tidak2Kali = status;
+//            return;
+//        }
+//        
+//        if(bayi.isMale()) 
+//            status = status && ((bayi.getPreviousWeight()!=0.0) ?
+//                ((bayi.getWeight()-bayi.getPreviousWeight()+0.000000000000004)*1000) < data.RefferenceTableForKMS
+//                .maleWeightUpIndicator[bayi.getAge() > 12 ? 12:bayi.getAge() ] : true);
+//        else
+//            status = status && ((bayi.getPreviousWeight()!=0.0) ?
+//                ((bayi.getWeight()-bayi.getPreviousWeight()+0.000000000000004)*1000) < data.RefferenceTableForKMS
+//                .femaleWeightUpIndicator[bayi.getAge() > 12 ? 12:bayi.getAge() ] : true);
+//
+//        if(bayi.isMale()) 
+//            status = status && ((bayi.getSecondLastWeight()!=0.0) ?
+//                ((bayi.getPreviousWeight()-bayi.getSecondLastWeight()+0.000000000000004)*1000) < data.RefferenceTableForKMS
+//                .maleWeightUpIndicator[bayi.getAge()-monthAges(bayi.getLastVisitDate(),bayi.getSecondLastVisitDate()) > 12 ? 12:bayi.getAge() ] : true);
+//        else
+//            status = status && ((bayi.getSecondLastWeight()!=0.0) ?
+//                ((bayi.getPreviousWeight()-bayi.getSecondLastWeight()+0.000000000000004)*1000) < data.RefferenceTableForKMS
+//                .femaleWeightUpIndicator[bayi.getAge()-monthAges(bayi.getLastVisitDate(),bayi.getSecondLastVisitDate()) > 12 ? 12:bayi.getAge() ] : true);
+        System.out.println("check 2T");
+        String measureDate[] = {new java.text.SimpleDateFormat("yyyy/MM/dd").format(new java.util.Date()),bayi.getLastVisitDate()};
+        double weight[] = {bayi.getWeight(),bayi.getPreviousWeight()};
+        status = status && (!cekWeightStatus(bayi.isMale(), bayi.getDateOfBirth(), measureDate, weight).equalsIgnoreCase("naik"));
+        String measureDate2[] = {bayi.getLastVisitDate(),bayi.getSecondLastVisitDate()};
+        double weight2[] = {bayi.getPreviousWeight(),bayi.getSecondLastWeight()};
+        status = status && (!cekWeightStatus(bayi.isMale(), bayi.getDateOfBirth(), measureDate2, weight2).equalsIgnoreCase("naik"));
         bayi.Tidak2Kali = status;
     }
     
@@ -59,15 +72,28 @@ public class KMSCalculator {
     }
     
     private void cekWeightStatus(data.Person bayi){
-        System.out.println((bayi.getWeight()-bayi.getPreviousWeight())+0.000000000000004);
-        if(bayi.isMale()) 
-            bayi.StatusBeratBadan = bayi.getPreviousWeight()==0.0 ? "timbang pertama" : 
-                ((bayi.getWeight()-bayi.getPreviousWeight()+0.000000000000004)*1000) >= data.RefferenceTableForKMS
-                .maleWeightUpIndicator[bayi.getAge() > 12 ? 12:bayi.getAge() ] ? "naik" : "tidak naik";
+        System.out.println("check weight status");
+        String measureDate[] = {new java.text.SimpleDateFormat("yyyy/MM/dd").format(new java.util.Date()),bayi.getLastVisitDate()};
+        double weight[] = {bayi.getWeight(),bayi.getPreviousWeight()};
+        bayi.StatusBeratBadan = cekWeightStatus(bayi.isMale(),bayi.getDateOfBirth(),measureDate,weight);
+    }
+    
+    private String cekWeightStatus(boolean isMale, String dateOfBirth, String measureDate[], double weight[]){
+        int age = monthAges(dateOfBirth,measureDate[0]);
+        System.out.println(""+age);
+        System.out.println(""+((weight[0]-weight[1]+0.000000000000004)*1000));
+        System.out.println(""+data.RefferenceTableForKMS.maleWeightUpIndicator[age > 12 ? 12:age ]);
+        String result="";
+        if(isMale) 
+            result = monthAges(measureDate[1],measureDate[0])>1 ? "timbang pertama" :((weight[0]-weight[1]+0.000000000000004)*1000) 
+                    >= data.RefferenceTableForKMS.maleWeightUpIndicator[age > 12 ? 12:age ] 
+                    ? "naik" : "tidak naik";
         else
-            bayi.StatusBeratBadan = bayi.getPreviousWeight()==0.0 ? "timbang pertama" : 
-                ((bayi.getWeight()-bayi.getPreviousWeight()+0.000000000000004)*1000) >= data.RefferenceTableForKMS
-                .femaleWeightUpIndicator[bayi.getAge() > 11 ? 11:bayi.getAge() ] ? "naik" : "tidak naik";
+            result = monthAges(measureDate[1],measureDate[0])>1 ? "timbang pertama" : ((weight[0]-weight[1]+0.000000000000004)*1000) 
+                    >= data.RefferenceTableForKMS.femaleWeightUpIndicator[age > 11 ? 11:age ]
+                    ? "naik" : "tidak naik";
+        
+        return result;
     }
     
     private void cekBGM(data.Person bayi){
